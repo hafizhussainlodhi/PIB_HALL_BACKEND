@@ -23,7 +23,10 @@ app.use(express.json());
 // ----------------------------------------------------------------------------
 // MongoDB Connection
 // ----------------------------------------------------------------------------
-mongoose.connect(MONGO_URI)
+mongoose.connect(MONGO_URI, {
+  family: 4,               // force IPv4 - fixes SRV DNS timeouts on Vercel serverless
+  serverSelectionTimeoutMS: 20000
+})
   .then(() => console.log('✅ MongoDB connected successfully to PIB_HALL database'))
   .catch((err) => console.error('❌ MongoDB connection error:', err.message));
 

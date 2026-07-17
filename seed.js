@@ -3,8 +3,9 @@
 //   node seed.js
 // ============================================================================
 require('dotenv').config();
+const dns = require('node:dns');
+dns.setServers(['1.1.1.1', '8.8.8.8']);
 const mongoose = require('mongoose');
-
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://admin:admin@cluster0.ueexwix.mongodb.net/PIB_HALL?retryWrites=true&w=majority';
 
 const userSchema = new mongoose.Schema({
