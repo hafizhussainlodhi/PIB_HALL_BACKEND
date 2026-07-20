@@ -5,7 +5,9 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const dns = require('node:dns');
 
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://admin:admin@cluster0.ueexwix.mongodb.net/PIB_HALL?retryWrites=true&w=majority';
