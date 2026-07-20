@@ -1,5 +1,5 @@
 // ============================================================================
-// PIB Wedding Hall Management System - Backend Server
+// Sorathia Muslim Ghanchi Jamat - Wedding Hall Management System - Backend Server
 // ============================================================================
 require('dotenv').config();
 const express = require('express');
@@ -53,6 +53,8 @@ const bookingSchema = new mongoose.Schema({
     required: true,
     default: 'Barat'
   },
+  // Free-text label used only when eventType === 'Other', e.g. "Aqiqah", "Anniversary"
+  customEventType: { type: String, default: '' },
   eventShift: {
     type: String,
     enum: ['Day', 'Night'],
@@ -192,7 +194,9 @@ app.get('/api/bookings', async (req, res) => {
 // POST create a new booking
 app.post('/api/bookings', async (req, res) => {
   try {
-    const { customerName, customerPhone, eventDate, hallPosition, eventType, eventShift, totalAmount, advancePaid } = req.body;
+    const { customerName, customerPhone, eventDate, hallPosition, eventType, customEventType, eventShift, totalAmount, advancePaid } = req.body;
+
+    console.log('[DEBUG] /api/bookings received body:', req.body);
 
     if (!customerName || !customerPhone || !eventDate || !hallPosition) {
       return res.status(400).json({ success: false, message: 'Missing required booking fields.' });
@@ -207,6 +211,10 @@ app.post('/api/bookings', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid event type.' });
     }
 
+    if (eventType === 'Other' && !customEventType) {
+      return res.status(400).json({ success: false, message: 'Please specify the event when choosing "Other".' });
+    }
+
     if (eventShift && !['Day', 'Night'].includes(eventShift)) {
       return res.status(400).json({ success: false, message: 'Invalid event shift. Must be Day or Night.' });
     }
@@ -217,12 +225,15 @@ app.post('/api/bookings', async (req, res) => {
       eventDate: new Date(eventDate),
       hallPosition,
       eventType: eventType || 'Barat',
+      customEventType: eventType === 'Other' ? (customEventType || '').trim() : '',
       eventShift: eventShift || 'Day',
       totalAmount: Number(totalAmount) || 0,
       advancePaid: Number(advancePaid) || 0
     });
 
     const savedBooking = await newBooking.save(); // balanceDue & paymentStatus auto-calculated
+
+    console.log('[DEBUG] saved booking eventType/customEventType:', savedBooking.eventType, savedBooking.customEventType);
 
     return res.status(201).json({ success: true, data: savedBooking });
   } catch (err) {
@@ -413,7 +424,7 @@ app.get('/api/analytics/yearly-chart', async (req, res) => {
 // Health check route
 // ----------------------------------------------------------------------------
 app.get('/', (req, res) => {
-  res.send('PIB Wedding Hall Management System API is running.');
+  res.send('Sorathia Muslim Ghanchi Jamat Management System API is running.');
 });
 
 // ----------------------------------------------------------------------------
