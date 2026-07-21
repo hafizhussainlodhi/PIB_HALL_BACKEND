@@ -243,7 +243,6 @@ app.post('/api/bookings', async (req, res) => {
   try {
     const { customerName, customerPhone, eventDate, hallPosition, eventType, customEventType, eventShift, totalAmount, advancePaid } = req.body;
 
-    console.log('[DEBUG] /api/bookings received body:', req.body);
 
     if (!customerName || !customerPhone || !eventDate || !hallPosition) {
       return res.status(400).json({ success: false, message: 'Missing required booking fields.' });
@@ -279,8 +278,6 @@ app.post('/api/bookings', async (req, res) => {
     });
 
     const savedBooking = await newBooking.save(); // balanceDue & paymentStatus auto-calculated
-
-    console.log('[DEBUG] saved booking eventType/customEventType:', savedBooking.eventType, savedBooking.customEventType);
 
     return res.status(201).json({ success: true, data: savedBooking });
   } catch (err) {
